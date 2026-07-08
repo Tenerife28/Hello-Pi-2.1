@@ -1,0 +1,170 @@
+"""
+Display subsystem for the Hello Pi project.
+
+Provides a simple interface for rendering text on the ST7735S SPI display.
+"""
+
+from __future__ import annotations
+
+import time
+
+import RPi.GPIO as GPIO
+from PIL import ImageFont
+from luma.core.interface.serial import spi
+from luma.core.render import canvas
+from luma.lcd.device import st7735
+
+import config
+
+
+class Display:
+    """ST7735S display driver."""
+
+    def __init__(self) -> None:
+
+        # ---------------- GPIO ----------------
+
+        GPIO.setmode(GPIO.BCM)
+        GPIO.setwarnings(False)
+
+        GPIO.setup(config.GPIO_DISPLAY_BL, GPIO.OUT)
+        GPIO.output(config.GPIO_DISPLAY_BL, GPIO.HIGH)
+
+        # Give the panel time to power up
+        time.sleep(0.05)
+
+        # ---------------- SPI ----------------
+
+        self._serial = spi(
+            port=config.SPI_PORT,
+            device=config.SPI_DEVICE,
+            gpio_DC=config.GPIO_DISPLAY_DC,
+            gpio_RST=config.GPIO_DISPLAY_RST,
+            bus_speed_hz=config.SPI_BUS_SPEED,
+        )
+
+        # Give SPI a moment before talking to the LCD
+        time.sleep(0.05)
+
+        # ---------------- LCD ----------------
+
+        self._device = st7735(
+            self._serial,
+            width=config.DISPLAY_WIDTH,
+            height=config.DISPLAY_HEIGHT,
+            rotate=config.DISPLAY_ROTATION,
+            h_offset=config.DISPLAY_H_OFFSET,
+            v_offset=config.DISPLAY_V_OFFSET,
+        )
+
+        # Let the controller finish initialization
+        time.sleep(0.10)
+
+        # ---------------- Fonts ----------------
+
+        try:
+            self._title_font = ImageFont.truetype(
+                config.DISPLAY_FONT,
+                config.DISPLAY_TITLE_SIZE,
+            )
+
+            self._subtitle_font = ImageFont.truetype(
+                config.DISPLAY_FONT,
+                config.DISPLAY_SUBTITLE_SIZE,
+            )
+
+        except OSError:
+            self._title_font = ImageFont.load_default()
+            self._subtitle_font = ImageFont.load_default()
+
+        # Start from a known state
+        self.clear()
+
+    def show(
+        self,
+        title: str,
+        subtitle: str = "",
+        background: str = config.COLOR_BACKGROUND,
+    ) -> None:
+        """Render a screen."""
+
+        self._render(title, subtitle, background)
+
+    def clear(self) -> None:
+        """Clear the display."""
+
+        self._render("", "", config.COLOR_BACKGROUND)
+
+    def backlight(self, on: bool) -> None:
+        """Enable or disable the backlight."""
+
+        GPIO.output(
+            config.GPIO_DISPLAY_BL,
+            GPIO.HIGH if on else GPIO.LOW,
+        )
+
+    def shutdown(self) -> None:
+        """Shutdown the display."""
+
+        try:
+            self.clear()
+        except Exception:
+            pass
+
+        self.backlight(False)
+        GPIO.cleanup(config.GPIO_DISPLAY_BL)
+
+    def _render(
+        self,
+        title: str,
+        subtitle: str,
+        background: str,
+    ) -> None:
+        """Render one frame."""
+
+        with canvas(self._device) as draw:
+
+            draw.rectangle(
+                self._device.bounding_box,
+                fill=background,
+            )
+
+            if title:
+
+                bbox = draw.textbbox(
+                    (0, 0),
+                    title,
+                    font=self._title_font,
+                )
+
+                width = bbox[2] - bbox[0]
+
+                draw.text(
+                    (
+                        config.DISPLAY_MARGIN_X,
+                        config.DISPLAY_TITLE_Y,
+                    ),
+                    title,
+                    font=self._title_font,
+                    fill=config.COLOR_TITLE,
+                )
+
+            if subtitle:
+
+                bbox = draw.textbbox(
+                    (0, 0),
+                    subtitle,
+                    font=self._subtitle_font,
+                )
+
+                width = bbox[2] - bbox[0]
+
+                draw.text(
+                    (
+                        config.DISPLAY_MARGIN_X,
+                        config.DISPLAY_SUBTITLE_Y,
+                    ),
+                    subtitle,
+                    font=self._subtitle_font,
+                    fill=config.COLOR_SUBTITLE,
+                )
