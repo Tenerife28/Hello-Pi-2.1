@@ -50,7 +50,7 @@ def main() -> None:
 
         input("\nPress ENTER to exit...")
 
-    finally:
+    finally:\
         display.shutdown()
 
 

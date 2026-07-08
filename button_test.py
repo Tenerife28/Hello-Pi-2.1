@@ -1,30 +1,43 @@
-import time
+"""
+Simple test for button.py
+"""
 
-import RPi.GPIO as GPIO
+from time import sleep
 
-BUTTON_PIN = 26
+from button import Button
 
-GPIO.setmode(GPIO.BCM)
-GPIO.setwarnings(False)
 
-GPIO.setup(BUTTON_PIN, GPIO.IN)
+def on_press():
+    print("Pressed")
 
-print("Touch the sensor (Ctrl+C to exit)\n")
 
-last = None
+def on_release():
+    print("Released")
 
-try:
-    while True:
-        state = GPIO.input(BUTTON_PIN)
 
-        if state != last:
-            print(f"GPIO26 = {state}")
-            last = state
+def main():
+    button = Button()
 
-        time.sleep(0.01)
+    button.register_press_callback(on_press)
+    button.register_release_callback(on_release)
 
-except KeyboardInterrupt:
-    pass
+    print("Button test")
+    print("Touch the sensor...")
+    print("Press Ctrl+C to exit.\n")
 
-finally:
-    GPIO.cleanup()
+    try:
+        while True:
+            sleep(0.1)
+
+            # Optional: show current state
+            # print(button.is_pressed())
+
+    except KeyboardInterrupt:
+        print("\nStopping...")
+
+    finally:
+        button.shutdown()
+
+
+if __name__ == "__main__":
+    main()

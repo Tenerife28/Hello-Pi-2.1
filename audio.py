@@ -15,6 +15,7 @@ class Audio:
         self._arecord = subprocess.Popen(
             [
                 config.ARECORD,
+                "-q", # Add quiet flag here
                 "-D", config.CAPTURE_DEVICE,
                 "-f", config.AUDIO_FORMAT,
                 "-r", str(config.AUDIO_RATE),
@@ -29,6 +30,7 @@ class Audio:
         self._aplay = subprocess.Popen(
             [
                 config.APLAY,
+                "-q", # Add quiet flag here
                 "-D", config.PLAYBACK_DEVICE,
                 "-f", config.AUDIO_FORMAT,
                 "-r", str(config.AUDIO_RATE),

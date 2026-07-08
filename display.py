@@ -8,7 +8,7 @@ from __future__ import annotations
 
 import time
 
-import RPi.GPIO as GPIO
+from gpiozero import LED
 from PIL import ImageFont
 from luma.core.interface.serial import spi
 from luma.core.render import canvas
@@ -22,16 +22,13 @@ class Display:
 
     def __init__(self) -> None:
 
-        # ---------------- GPIO ----------------
+        # ---------------- Backlight ----------------
 
-        GPIO.setmode(GPIO.BCM)
-        GPIO.setwarnings(False)
-
-        GPIO.setup(config.GPIO_DISPLAY_BL, GPIO.OUT)
-        GPIO.output(config.GPIO_DISPLAY_BL, GPIO.HIGH)
+        # self._bl = LED(config.GPIO_DISPLAY_BL)
+        # self._bl.on()
 
         # Give the panel time to power up
-        time.sleep(0.05)
+        time.sleep(0.10)
 
         # ---------------- SPI ----------------
 
@@ -39,11 +36,12 @@ class Display:
             port=config.SPI_PORT,
             device=config.SPI_DEVICE,
             gpio_DC=config.GPIO_DISPLAY_DC,
-            gpio_RST=config.GPIO_DISPLAY_RST,
-            bus_speed_hz=config.SPI_BUS_SPEED,
+            gpio_RST=config.GPIO_DISPLAY_RST, 
+            bus_speed_hz=config.SPI_BUS_SPEED, # Keep this at your 16_000_000!
+            transfer_size=64,
+            gpio_LIGHT=None,
         )
 
-        # Give SPI a moment before talking to the LCD
         time.sleep(0.05)
 
         # ---------------- LCD ----------------
@@ -55,9 +53,9 @@ class Display:
             rotate=config.DISPLAY_ROTATION,
             h_offset=config.DISPLAY_H_OFFSET,
             v_offset=config.DISPLAY_V_OFFSET,
+            gpio_LIGHT=config.GPIO_DISPLAY_BL,
         )
 
-        # Let the controller finish initialization
         time.sleep(0.10)
 
         # ---------------- Fonts ----------------
@@ -77,7 +75,6 @@ class Display:
             self._title_font = ImageFont.load_default()
             self._subtitle_font = ImageFont.load_default()
 
-        # Start from a known state
         self.clear()
 
     def show(
@@ -98,10 +95,10 @@ class Display:
     def backlight(self, on: bool) -> None:
         """Enable or disable the backlight."""
 
-        GPIO.output(
-            config.GPIO_DISPLAY_BL,
-            GPIO.HIGH if on else GPIO.LOW,
-        )
+        # if on:
+        #     self._bl.on()
+        # else:
+        #     self._bl.off()
 
     def shutdown(self) -> None:
         """Shutdown the display."""
@@ -111,8 +108,8 @@ class Display:
         except Exception:
             pass
 
-        self.backlight(False)
-        GPIO.cleanup(config.GPIO_DISPLAY_BL)
+        # self._bl.off()
+        # self._bl.close()
 
     def _render(
         self,
@@ -131,14 +128,6 @@ class Display:
 
             if title:
 
-                bbox = draw.textbbox(
-                    (0, 0),
-                    title,
-                    font=self._title_font,
-                )
-
-                width = bbox[2] - bbox[0]
-
                 draw.text(
                     (
                         config.DISPLAY_MARGIN_X,
@@ -150,14 +139,6 @@ class Display:
                 )
 
             if subtitle:
-
-                bbox = draw.textbbox(
-                    (0, 0),
-                    subtitle,
-                    font=self._subtitle_font,
-                )
-
-                width = bbox[2] - bbox[0]
 
                 draw.text(
                     (
