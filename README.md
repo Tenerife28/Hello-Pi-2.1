@@ -36,6 +36,16 @@ Hello Pi combines a microphone, speaker, display and touch button into a simple,
 | RST | GPIO25 |
 | BL | GPIO22 |
 
+### Microphone (INMP441)
+
+| INMP441 | Raspberry Pi |
+|----------|--------------|
+| VCC | 3.3V |
+| GND | GND |
+| SCK | GPIO18 (I²S BCLK) |
+| WS | GPIO19 (I²S LRCLK) |
+| SD | GPIO20 (I²S DIN) |
+
 ### Button
 
 | Button | Raspberry Pi |
