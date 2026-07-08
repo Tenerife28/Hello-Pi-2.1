@@ -54,17 +54,6 @@ Hello Pi combines a microphone, speaker, display and touch button into a simple,
 | GND | GND |
 | OUT | GPIO26 |
 
-## Project
-
-```
-Hello Pi 2.1
-├── audio.py
-├── button.py
-├── display.py
-├── config.py
-├── main.py
-└── requirements.txt
-```
 
 ## Installation
 
