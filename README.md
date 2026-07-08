@@ -36,7 +36,7 @@ Hello Pi combines a microphone, speaker, display and touch button into a simple,
 | RST | GPIO25 |
 | BL | GPIO22 |
 
-### Microphone (INMP441)
+### Microphone
 
 | INMP441 | Raspberry Pi |
 |----------|--------------|
