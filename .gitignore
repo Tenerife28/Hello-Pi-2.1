@@ -1,0 +1,28 @@
+# Python
+.venv/
+__pycache__/
+*.py[cod]
+
+# VS Code
+.vscode/
+
+# Logs & recordings
+*.wav
+*.log
+
+# Python caches
+.pytest_cache/
+.mypy_cache/
+
+# Environment
+.env
+
+# Misc
+.lgd-nfy0
+
+# Test files
+button_test.py
+display_test.py
+hardware_test.py
+test_audio.py
+test.py
