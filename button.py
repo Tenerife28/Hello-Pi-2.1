@@ -1,19 +1,20 @@
 import threading
 import time
 
-import RPi.GPIO as GPIO
+from gpiozero import Button as GPIOButton
 
 import config
 
 
 class Button:
     def __init__(self):
-        GPIO.setmode(GPIO.BCM)
-        GPIO.setwarnings(False)
+        self._button = GPIOButton(
+            config.GPIO_BUTTON,
+            pull_up=False,
+        )
 
-        GPIO.setup(config.GPIO_BUTTON, GPIO.IN)
+        self._pressed = self._button.is_pressed
 
-        self._pressed = GPIO.input(config.GPIO_BUTTON)
         self._on_press = None
         self._on_release = None
 
@@ -37,11 +38,11 @@ class Button:
     def shutdown(self):
         self._running = False
         self._thread.join()
-        GPIO.cleanup(config.GPIO_BUTTON)
+        self._button.close()
 
     def _loop(self):
         while self._running:
-            state = GPIO.input(config.GPIO_BUTTON)
+            state = self._button.is_pressed
 
             if state != self._pressed:
                 self._pressed = state
@@ -53,4 +54,4 @@ class Button:
                     if self._on_release:
                         self._on_release()
 
-            time.sleep(0.01)
+            time.sleep(config.BUTTON_POLL_INTERVAL)
