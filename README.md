@@ -70,7 +70,7 @@ pip install -r requirements.txt
 ## Run
 
 ```bash
-python3 main.py
+python3 app.py
 ```
 
 ## Roadmap
