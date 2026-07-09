@@ -94,4 +94,3 @@ python3 app.py
 
 ---
 
-Built with ❤️ for Raspberry Pi.
