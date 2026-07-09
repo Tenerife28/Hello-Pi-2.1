@@ -5,7 +5,6 @@ Ties together the Display, Audio, and Button subsystems.
 
 import time
 import sys
-
 from audio import Audio
 from button import Button
 from display import Display

@@ -1,8 +1,6 @@
 import threading
 import time
-
 from gpiozero import Button as GPIOButton
-
 import config
 
 

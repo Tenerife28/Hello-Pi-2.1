@@ -5,9 +5,7 @@ Provides a simple interface for rendering text on the ST7735S SPI display.
 """
 
 from __future__ import annotations
-
 import time
-
 from gpiozero import LED
 from PIL import ImageFont
 from luma.core.interface.serial import spi
@@ -21,13 +19,6 @@ class Display:
     """ST7735S display driver."""
 
     def __init__(self) -> None:
-
-        # ---------------- Backlight ----------------
-
-        # self._bl = LED(config.GPIO_DISPLAY_BL)
-        # self._bl.on()
-
-        # Give the panel time to power up
         time.sleep(0.10)
 
         # ---------------- SPI ----------------
@@ -37,7 +28,7 @@ class Display:
             device=config.SPI_DEVICE,
             gpio_DC=config.GPIO_DISPLAY_DC,
             gpio_RST=config.GPIO_DISPLAY_RST, 
-            bus_speed_hz=config.SPI_BUS_SPEED, # Keep this at your 16_000_000!
+            bus_speed_hz=config.SPI_BUS_SPEED,
             transfer_size=64,
             gpio_LIGHT=None,
         )
@@ -91,25 +82,6 @@ class Display:
         """Clear the display."""
 
         self._render("", "", config.COLOR_BACKGROUND)
-
-    def backlight(self, on: bool) -> None:
-        """Enable or disable the backlight."""
-
-        # if on:
-        #     self._bl.on()
-        # else:
-        #     self._bl.off()
-
-    def shutdown(self) -> None:
-        """Shutdown the display."""
-
-        try:
-            self.clear()
-        except Exception:
-            pass
-
-        # self._bl.off()
-        # self._bl.close()
 
     def _render(
         self,
