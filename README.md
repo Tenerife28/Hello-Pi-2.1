@@ -17,6 +17,7 @@ Hello Pi combines a microphone, speaker, display and touch button into a simple,
 | Component | Model |
 |----------|-------|
 | SBC | Raspberry Pi 4B |
+| MCU | Arduino Nano |
 | Display | ST7735S 160×128 TFT |
 | Microphone | INMP441 |
 | Button | Capacitive Touch Sensor |
