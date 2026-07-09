@@ -20,6 +20,7 @@ Hello Pi combines a microphone, speaker, display and touch button into a simple,
 | Display | ST7735S 160×128 TFT |
 | Microphone | INMP441 |
 | Button | Capacitive Touch Sensor |
+|Light Sensor| TEMT6000|
 
 ## Wiring
 
@@ -34,7 +35,7 @@ Hello Pi combines a microphone, speaker, display and touch button into a simple,
 | CS | GPIO8 (CE0) |
 | DC | GPIO17 |
 | RST | GPIO25 |
-| BL | GPIO22 |
+| BL | D3-5 (nano) |
 
 ### Microphone
 
@@ -53,6 +54,14 @@ Hello Pi combines a microphone, speaker, display and touch button into a simple,
 | VCC | 3.3V |
 | GND | GND |
 | OUT | GPIO26 |
+
+### Light Sensor
+
+| TEMT6000 | Arduino Nano |
+|--------|---------------|
+| VCC | 5V |
+| GND | GND |
+| OUT | A0 | 
 
 
 ## Installation
